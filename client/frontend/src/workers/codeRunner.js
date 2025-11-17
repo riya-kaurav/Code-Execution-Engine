@@ -1,20 +1,33 @@
-/* eslint-disable no-restricted-globals */
-
 self.onmessage = function (e) {
-  const code = e.data;
+  const userCode = e.data;
+
   try {
-    const consoleLogs = [];
-    const customConsole = {
-      log: (...args) => consoleLogs.push(args.join(" ")),
-    };
+    // Protect against infinite loops
+    const wrappedCode = `
+      let __start = Date.now();
+      function __check() {
+        if (Date.now() - __start > 1000) {
+          throw new Error("Time Limit Exceeded (TLE)");
+        }
+      }
 
-    // Redirect console.log inside worker
-    const result = new Function("console", code)(customConsole);
+      // Insert loop checks
+      const safeCode = \`${userCode.replace(/for|while|do/g, match => match + "; __check();")}\`;
 
-    self.postMessage({
-      type: "success",
-      output: consoleLogs.length ? consoleLogs.join("\n") : String(result),
-    });
+      (function() {
+        "use strict";
+        const window = undefined;
+        const document = undefined;
+        const localStorage = undefined;
+        const fetch = undefined;
+
+        return eval(safeCode);
+      })();
+    `;
+
+    const result = eval(wrappedCode);
+
+    self.postMessage({ type: "success", output: String(result) });
   } catch (err) {
     self.postMessage({ type: "error", output: err.message });
   }
