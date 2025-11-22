@@ -1,0 +1,18 @@
+{
+  "id": "p1",
+  "title": "Add Two Numbers",
+  "description": "Given two integers, return their sum.",
+  "input": "Two integers a and b.",
+  "output": "Return a + b.",
+  "constraints": "1 ≤ a, b ≤ 10^9",
+  "samples": [
+    {
+      "input": [3, 7],
+      "output": 10
+    },
+    {
+      "input": [10, 5],
+      "output": 15
+    }
+  ]
+}
