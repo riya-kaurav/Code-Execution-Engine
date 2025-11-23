@@ -14,5 +14,15 @@
       "input": [10, 5],
       "output": 15
     }
+  ],
+  "testcases": [
+    {
+      "input": "3 7",
+      "output": "10"
+    },
+    {
+      "input": "10 5",
+      "output": "15"
+    }
   ]
 }

@@ -1,118 +1,96 @@
-import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import CodeEditor from "../components/Editor";
 
 export default function EditorPage() {
   const { id } = useParams();
   const [problem, setProblem] = useState(null);
+  const [code, setCode] = useState("// Write your code here");
   const [language, setLanguage] = useState("javascript");
-  const [code, setCode] = useState("// Write your solution here");
-  const [verdict, setVerdict] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState([]);
+  const [result, setResult] = useState("");
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5000/problems/${id}`)
-      .then((res) => setProblem(res.data))
-      .catch((err) => console.log(err));
-  }, [id]);
-
-  const runTests = async () => {
-    setLoading(true);
-    setVerdict("");
-    setResults([]);
-
-    try {
-      const res = await axios.post("http://localhost:5000/judge/submit", {
-        code,
-        language,
-        problemId: id,
-      });
-
-      setVerdict(res.data.verdict);
-      setResults(res.data.results);
-
-    } catch (err) {
-      setVerdict("Error running code");
+    async function fetchProblem() {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/problems/${id}`   
+        );
+        setProblem(res.data);
+      } catch (err) {
+        console.log("❌ Error loading problem:", err);
+      }
     }
 
-    setLoading(false);
+    if (id) fetchProblem();
+  }, [id]);
+
+  const handleSubmit = async () => {
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/judge/submit",     
+        {
+          code,
+          language,
+          problemId: id,
+        }
+      );
+      setResult(res.data);
+    } catch (error) {
+      setResult("❌ Server Error");
+      console.log(error);
+    }
   };
 
+  if (!problem)
+    return (
+      <div className="text-center text-gray-300 mt-10 text-xl">
+        Loading Problem...
+      </div>
+    );
+
   return (
-    <div className="p-6 flex flex-col gap-6">
-      {problem && (
-        <div className="bg-gray-800 p-5 rounded">
-          <h1 className="text-3xl font-bold">{problem.title}</h1>
-          <p className="mt-3">{problem.description}</p>
+    <div className="p-4 text-white">
+      <h1 className="text-3xl font-bold mb-2">{problem.title}</h1>
+      <p className="text-gray-300 mb-4">{problem.description}</p>
 
-          <h3 className="mt-4 font-semibold">Input:</h3>
-          <p>{problem.input}</p>
+      <div className="space-y-2 mb-4">
+        <p><strong>Input:</strong> {problem.input}</p>
+        <p><strong>Output:</strong> {problem.output}</p>
+        <p><strong>Constraints:</strong> {problem.constraints}</p>
+      </div>
 
-          <h3 className="mt-4 font-semibold">Output:</h3>
-          <p>{problem.output}</p>
+      <h2 className="text-xl font-semibold mb-2">Sample Test Cases</h2>
 
-          <h3 className="mt-4 font-semibold">Constraints:</h3>
-          <p>{problem.constraints}</p>
-
-          <h3 className="mt-4 font-semibold">Sample Testcases:</h3>
-          {problem.samples.map((s, i) => (
-            <div key={i} className="bg-gray-900 mt-2 p-3 rounded">
-              <p><strong>Input:</strong> {JSON.stringify(s.input)}</p>
-              <p><strong>Output:</strong> {s.output}</p>
-            </div>
-          ))}
-        </div>
+      {problem.samples && problem.samples.length > 0 ? (
+        problem.samples.map((sample, i) => (
+          <div key={i} className="bg-gray-800 p-3 rounded mb-2">
+            <p><strong>Input:</strong> {JSON.stringify(sample.input)}</p>
+            <p><strong>Expected Output:</strong> {sample.output}</p>
+          </div>
+        ))
+      ) : (
+        <p className="text-gray-400">No samples available</p>
       )}
 
-      <select
-        value={language}
-        onChange={(e) => setLanguage(e.target.value)}
-        className="bg-gray-800 p-2 rounded w-40"
-      >
-        <option value="javascript">JavaScript</option>
-        <option value="python">Python</option>
-      </select>
-
-      <CodeEditor code={code} setCode={setCode} language={language} />
+      <div className="my-6">
+        <h2 className="text-xl font-semibold mb-2">Code Editor</h2>
+        <CodeEditor code={code} setCode={setCode} language={language} />
+      </div>
 
       <button
-        onClick={runTests}
-        disabled={loading}
-        className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded w-40"
+        onClick={handleSubmit}
+        className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition"
       >
-        {loading ? "Running..." : "Run Code"}
+        Submit Code
       </button>
 
-      {verdict && (
-        <div
-          className={`p-3 rounded text-lg ${
-            verdict === "Accepted" ? "bg-green-600" : "bg-red-600"
-          }`}
-        >
-          {verdict}
-        </div>
-      )}
-
-      {results.length > 0 && (
-        <div className="bg-gray-800 p-4 rounded">
-          <h3 className="text-xl font-semibold mb-2">Test Results</h3>
-
-          {results.map((r, i) => (
-            <div
-              key={i}
-              className="bg-gray-900 p-2 rounded mt-2 flex justify-between"
-            >
-              <span>Test {i + 1}</span>
-              <span className={r.pass ? "text-green-400" : "text-red-400"}>
-                {r.pass ? "Passed" : "Failed"}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="mt-4 bg-gray-800 p-3 rounded">
+        <h2 className="text-lg font-semibold">Output:</h2>
+        <pre className="text-gray-300">
+          {result ? JSON.stringify(result, null, 2) : ""}
+        </pre>
+      </div>
     </div>
   );
 }

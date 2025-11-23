@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function Home() {
   return (
     <div className="text-center mt-20">
-      <h1 className="text-4xl font-bold">Welcome to CodeJudge 🚀</h1>
+      <h1 className="text-4xl font-bold">Welcome to CodeJudge </h1>
       <p className="mt-4 text-gray-300">
         Solve coding problems & run your code instantly.
       </p>
@@ -17,3 +17,4 @@ export default function Home() {
     </div>
   );
 }
+

@@ -18,4 +18,3 @@ export default function CodeEditor({ code, setCode, language }) {
     </div>
   );
 }
-

@@ -1,20 +1,21 @@
+// server/index.js
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-
-const problemRoutes = require("./routes/problems");
-const submitRoutes = require("./routes/submit");
+const fs = require("fs");
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-// API routes
-app.use("/api", problemRoutes);
-app.use("/api", submitRoutes);
+// ensure temp exists
+const tempDir = path.join(__dirname, "temp");
+if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// mount routes
+app.use("/run", require("./routes/run"));         // POST /run  { code, language, input }
+app.use("/judge", require("./routes/judge"));     // POST /judge/submit { code, language, problemId }
+app.use("/problems", require("./routes/problems"));// GET /problems, GET /problems/:id
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Judge server running on ${PORT}`));

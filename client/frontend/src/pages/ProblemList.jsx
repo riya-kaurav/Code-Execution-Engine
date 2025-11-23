@@ -6,7 +6,8 @@ export default function ProblemList() {
   const [problems, setProblems] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/problems")
+    axios
+      .get("http://localhost:5000/problems")   
       .then((res) => setProblems(res.data))
       .catch((err) => console.log(err));
   }, []);
