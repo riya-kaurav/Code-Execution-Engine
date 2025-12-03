@@ -1,69 +1,134 @@
-# 🧩 Design Document — Scalable Code Execution Engine
-
-## 1. Problem Understanding
-Executing user code at scale requires balancing *speed, **security, and **cost*.  
-Naive approaches (like running everything in one container) are insecure and unscalable.
 
 ---
 
-## 2. Design Goals
-| Goal | Description |
-|------|--------------|
-| Security | Isolate untrusted code completely |
-| Scalability | Handle thousands of concurrent executions |
-| Latency | Fast response for small code snippets |
-| Reliability | No single point of failure |
-| Developer Experience | Clean architecture and observability |
+# Design.md **
+
+```markdown
+# System Design Document – Online Code Judge
+
+## 1. Overview
+
+This document explains the **design principles**, **data flow**, and **components** of the Online Code Judge system.  
+The goal is to create a scalable, secure, and developer-friendly judge platform.
 
 ---
 
-## 3. Architecture Overview
-*Approach:* Hybrid client–server model  
-- Client handles simple code runs via WASM/Web Worker  
-- Server executes heavy jobs in isolated sandboxes  
-- Queue separates execution layer for scalability
+## 2. System Goals
 
-(Insert diagram here: docs/architecture-diagram.png)
+### Functional Requirements
+- Execute code in multiple languages.
+- Evaluate code using predefined test cases.
+- Store problems and submissions.
+- Provide a responsive UI for coding.
 
----
-
-## 4. Tradeoffs & Design Choices
-
-| Area | Choice | Alternative | Reason |
-|------|---------|-------------|--------|
-| Queue | Redis + BullMQ | RabbitMQ, Kafka | Simpler setup, async retries |
-| Execution | Node.js isolated processes | Docker containers | Faster cold start during hackathon |
-| Client Execution | Web Worker | Service Worker | Dedicated thread, no network |
-| Database | MongoDB | Postgres | Simpler JSON-based storage for submissions |
-| Language Support | JS + Python | C++, Java | Easy sandboxing for demo |
+### Non-Functional Requirements
+- Security: no code can affect host machine.
+- Performance: run code fast (<1s typical).
+- Scalability: add more languages easily.
+- Reliability: no container reuse.
 
 ---
 
-## 5. Scaling Strategy
-- *Horizontal scaling:* multiple worker instances
-- *Queue-based backpressure:* job rate control
-- *Caching:* frequently used problem data in Redis
-- *Autoscaling policy:* monitor queue length → add/remove workers
+## 3. High-Level Design
+
+### Components
+| Component | Responsibility |
+|----------|----------------|
+| Frontend | UI for editor and problem solving |
+| Backend | APIs, judging, execution |
+| Docker Sandbox | Isolated runtime environment |
+| Database | Problems, submissions |
 
 ---
 
-## 6. Security Strategy
-- Run untrusted code inside restricted child processes
-- Enforce resource limits via child_process.spawn + timeout
-- Disable network + filesystem access
-- Memory & CPU usage monitored per job
-- Sanitize all user input
+## 4. Code Execution Flow
+
+1. User clicks **Run**.
+2. Request goes to `POST /run`.
+3. Server creates a **temp file**.
+4. Backend selects matching Docker image.
+5. Starts container → mounts temp folder.
+6. Executes code inside container.
+7. Captures:
+   - stdout  
+   - stderr  
+   - execution time  
+8. Sends back JSON response.
 
 ---
 
-## 7. Future Improvements
-- Add multi-language runtime (Dockerized per-language)
-- Use gVisor/Firecracker for deeper isolation
-- Distributed job tracking with Kafka + ElasticSearch
+## 5. Judge Flow (with Test Cases)
+
+1. User submits code on a problem.
+2. Backend loads problem JSON:
+   ```json
+   {
+     "title": "",
+     "constraints": "",
+     "testCases": [
+       { "input": "1 2", "output": "3" }
+     ]
+   }
+
+3. For each test case:
+
+Write temp file
+
+Run inside Docker
+
+Compare expected vs actual output
+
+4. Return 
+{
+  "status": "Accepted" or "Wrong Answer",
+  "passed": 3,
+  "total": 5
+}
+
+## 6. Frontend Design
+
+### Pages
+
+Home Page (list problems)
+
+Problem Page (editor + test cases)
+
+Run & Output Section
+
+Submission Result Modal
+
+- State Management
+
+### React Context for:
+
+- current problem
+
+- current code
+
+- language
+
+- output
 
 ---
 
-## 8. References
-- [BullMQ Docs](https://docs.bullmq.io)
-- [Monaco Editor](https://microsoft.github.io/monaco-editor/)
-- [gVisor Sandbox](https://gvisor.dev/)
+## 7. Error Handling
+
+- Docker timeout after X seconds
+
+- Memory overflow check
+
+- Runtime errors shown to user
+
+- Validation for empty code/language
+
+
+## 8. Security Considerations
+
+- Every run uses a new container
+
+- --cpus=1, -m 256m (resource limits)
+
+- No host filesystem exposed except temp
+
+- Network access blocked in container
+

@@ -1,48 +1,108 @@
-# 🧠 Scalable Code Execution Engine
+#  Scalable Code Execution Engine
 
-### 🚀 Overview
-A hybrid code execution platform inspired by HackerRank & LeetCode — designed for scalability, isolation, and real-time feedback.
+###  Overview
+A full-stack online code execution and judging platform built with **React**, **Node.js**, **Express**, **MongoDB**, and **Docker-based sandboxing**.  
+It allows users to write code, run it in a secure container, and attempt coding problems with automated evaluation.
 
-### 🎯 Problem Statement
-Executing untrusted user code securely and efficiently at scale is challenging.  
-Traditional APIs (like Judge0) solve it, but here we design our own *isolated execution system* with scalability and sandboxing in mind.
 
-### ⚙️ Key Features
-- Monaco Editor (frontend)
-- Hybrid execution: Web Worker (client) + Server sandbox
-- Queue-driven architecture for scalable job handling
-- Resource limits & isolation for security
-- Real-time feedback & monitoring
+##  Features
 
-### 🧩 System Architecture
+###  Code Execution
+- Supports **multiple languages** (C, C++, Python, JavaScript).
+- Executes code in **isolated Docker containers** for safety.
+- Captures **stdout, stderr, and execution time**.
+
+###  Coding Problems
+- Browse problems with title, difficulty, and description.
+- Submit code for evaluation.
+- Judge runs code using **predefined test cases**.
+
+###  Clean UI
+- Monaco-based code editor
+- Output panel (stdout, stderr, time)
+- Problem page with test cases & submit button
+
+
+## 📁 Folder Structure
+
+root/
+│
+├── client/ # React frontend
+│ ├── src/
+│ │ ├── pages/
+│ │ ├── components/
+│ │ ├── api/
+│ │ └── context/
+│ └── package.json
+│
+├── server/
+│ ├── index.js # Express app entry
+│ ├── routes/
+│ │ ├── run.js # Code execution API
+│ │ ├── judge.js # Judge + submission API
+│ │ └── problems.js # Problem APIs
+│ ├── problems/ # Problem JSON files
+│ ├── temp/ # Temporary code files
+│ ├── docker/ # Docker sandboxes
+│ ├── utils/
+│ └── package.json
+│
+└── README.md
+
+
+---
+
+## Running Locally 
+
+### Clone 
+git clone <repo-url>
+cd project
+
+### Install Client 
+cd client
+npm install
+npm run dev
+
+### Install Server 
+cd server
+npm install
+node server.js
+
+---
+
+
+
+---
+
+## 🐳 Docker-Based Execution
+
+Each code run spins up a **new lightweight container** like this:
+
+```bash
+   docker run --rm -m 256m --cpus="1" \
+   -v /server/temp:/app \
+   sandbox-image python3 code.py
+
+---
+
+ ## Documentation
+
+Detailed docs are available in:
+
+docs/design.md
+
+docs/architecture.md
+
+
+
+###  System Architecture Diagram
 (Insert your architecture diagram image here — docs/architecture-diagram.png)
 
-*Core Components:*
-- Frontend: React + Monaco + Web Worker
-- Backend: Node.js + Express
-- Queue: Redis + BullMQ
-- Database: MongoDB
-- Sandbox: Ephemeral isolated processes
 
-### 🌐 Execution Flow
-1. User writes & tests code in browser (Web Worker).
-2. On submit → request sent to backend.
-3. Backend pushes job → Queue.
-4. Worker executes inside sandbox → returns result.
-5. Results stored in MongoDB → shown in UI.
 
-### 🧠 Design Highlights
-- Hybrid model reduces server load and latency.
-- Queue decouples frontend and execution layer.
-- Sandbox ensures untrusted code safety.
-- Horizontal scalability: more workers = higher throughput.
 
-### 🔒 Security
-- CPU/memory/time limits for all jobs.
-- Network & file system access disabled.
-- Isolated process per execution.
 
-### 🪄 Tech Stack
-*Frontend:* React (Vite), Monaco Editor, Web Workers  
-*Backend:* Node.js, Express, MongoDB, Redis (BullMQ)  
-*Deployment:* Docker + optional scaling with PM2/Kubernetes
+## Contributing
+
+Pull requests are welcome.
+For updates, open an issue.
