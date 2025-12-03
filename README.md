@@ -24,31 +24,7 @@ It allows users to write code, run it in a secure container, and attempt coding 
 
 ---
 
-##  Project Folder Structure
-
-root/
-│
-├── client/                     # React frontend
-│   ├── src/
-│   │   ├── pages/              # Application pages
-│   │   ├── components/         # Reusable UI components
-│   │   ├── api/                # API integration layer
-│   │   └── context/            # Global state/context providers
-│   └── package.json            # Frontend dependencies & scripts
-│
-├── server/                     # Backend (Express.js)
-│   ├── index.js                # Express app entry point
-│   ├── routes/
-│   │   ├── run.js              # Code execution API
-│   │   ├── judge.js            # Judge + submission API
-│   │   └── problems.js         # Problem APIs
-│   ├── problems/               # Problem JSON files
-│   ├── temp/                   # Temporary code files
-│   ├── docker/                 # Docker sandboxes
-│   ├── utils/                  # Utility functions
-│   └── package.json            # Backend dependencies & scripts
-│
-└── README.md                   # Project documentation
+                 
 
 
 ---
@@ -97,3 +73,15 @@ docs/architecture.md
 
 Pull requests are welcome.
 For updates, open an issue.
+
+
+---
+
+## 🐳 Docker-Based Execution
+
+Each code run spins up a **new lightweight container** like this:
+
+```bash
+docker run --rm -m 256m --cpus="1" \
+   -v /server/temp:/app \
+   sandbox-image python3 code.py
