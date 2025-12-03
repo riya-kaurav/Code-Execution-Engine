@@ -75,12 +75,6 @@ Dockerfile
 run.sh
 
 
-### Container Run Example
-
-```bash
-docker run --rm \
-   -m 256m --cpus="1" \
-   -v temp:/app sandbox-cpp ./run.sh file.cpp
 
 
 
