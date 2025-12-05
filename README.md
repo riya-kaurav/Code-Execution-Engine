@@ -74,7 +74,7 @@ For updates, open an issue.
 
 ---
 
-## 🐳 Docker-Based Execution
+##  Docker-Based Execution
 
 Each code run spins up a **new lightweight container** like this:
 
