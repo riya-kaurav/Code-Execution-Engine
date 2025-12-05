@@ -62,9 +62,6 @@ docs/architecture.md
 
 ---
 
-###  System Architecture Diagram
-(Insert your architecture diagram image here — docs/architecture-diagram.png)
-
 
 
 
