@@ -58,7 +58,7 @@ Detailed docs are available in:
 
 docs/design.md
 
-docs/architecture.md
+
 
 ---
 
