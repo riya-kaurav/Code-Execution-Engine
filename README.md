@@ -56,7 +56,7 @@ node server.js
 
 Detailed docs are available in:
 
-docs/design.md
+
 
 
 
