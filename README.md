@@ -52,13 +52,6 @@ node server.js
 ---
 
 
- ## Documentation
-
-Detailed docs are available in:
-
-
-
-
 
 ---
 
