@@ -67,11 +67,3 @@ For updates, open an issue.
 
 ---
 
-##  Docker-Based Execution
-
-Each code run spins up a **new lightweight container** like this:
-
-```bash
-docker run --rm -m 256m --cpus="1" \
-   -v /server/temp:/app \
-   sandbox-image python3 code.py
