@@ -49,17 +49,6 @@ node server.js
 
 
 
----
-
-
-
----
-
-
-
-
-
-## Contributing
 
 Pull requests are welcome.
 For updates, open an issue.
