@@ -8,7 +8,7 @@ It allows users to write code, run it in a secure container, and attempt coding 
 ##  Features
 
 ###  Code Execution
-- Supports **multiple languages** (C, C++, Python, JavaScript).
+- Supports **multiple languages** (C++, Python, JavaScript).
 - Executes code in **isolated Docker containers** for safety.
 - Captures **stdout, stderr, and execution time**.
 
